@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
+
 
 enum class FilterType { ALL, ACTIVE, DONE }
 
@@ -21,6 +23,15 @@ class TodoViewModel : ViewModel() {
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query
+
+    // Tambahkan di class TodoViewModel
+    val activeCount: StateFlow<Int> = _todos
+        .map { list -> list.count { !it.isDone } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    val completedCount: StateFlow<Int> = _todos
+        .map { list -> list.count { it.isDone } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
 
     val filteredTodos: StateFlow<List<Todo>> =
         combine(_todos, _filter, _query) { todos, filter, q ->

@@ -16,6 +16,8 @@ import com.kelompok4.todolistreactiveapp.viewmodel.TodoViewModel
 
 @Composable
 fun TodoScreen(vm: TodoViewModel = viewModel()) {
+    val activeCount by vm.activeCount.collectAsState()
+    val completedCount by vm.completedCount.collectAsState()
     val todos by vm.filteredTodos.collectAsState()
     val currentFilter by vm.filter.collectAsState()
     val query by vm.query.collectAsState()
@@ -47,8 +49,14 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
                 .padding(vertical = 8.dp)
         ) {
             FilterButton("Semua", currentFilter == FilterType.ALL) { vm.setFilter(FilterType.ALL) }
-            FilterButton("Aktif", currentFilter == FilterType.ACTIVE) { vm.setFilter(FilterType.ACTIVE) }
-            FilterButton("Selesai", currentFilter == FilterType.DONE) { vm.setFilter(FilterType.DONE) }
+            FilterButton(
+                "Aktif",
+                currentFilter == FilterType.ACTIVE
+            ) { vm.setFilter(FilterType.ACTIVE) }
+            FilterButton(
+                "Selesai",
+                currentFilter == FilterType.DONE
+            ) { vm.setFilter(FilterType.DONE) }
         }
 
         OutlinedTextField(
@@ -63,6 +71,15 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
         )
 
         Divider()
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text(text = "Aktif: $activeCount", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Selesai: $completedCount", style = MaterialTheme.typography.bodyMedium)
+        }
 
         LazyColumn {
             items(todos) { todo ->
@@ -76,7 +93,8 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
     }
 }
 
-@Composable
+
+        @Composable
 fun FilterButton(text: String, selected: Boolean, onClick: () -> Unit) {
     if (selected) {
         Button(onClick = onClick) { Text(text) }
